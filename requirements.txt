@@ -1,0 +1,14 @@
+pandas
+numpy
+scikit-learn
+scipy
+joblib
+xgboost
+shap
+matplotlib
+spacy
+sentence-transformers
+torch
+transformers
+sentencepiece
+accelerate

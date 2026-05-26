@@ -1,0 +1,30 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Pre-download SpaCy lightweight english model
+RUN python -m spacy download en_core_web_sm
+
+# Copy codebase and artifacts needed for ML loading
+COPY backend/ /app/backend/
+COPY src/ /app/src/
+COPY artifacts/ /app/artifacts/
+COPY data/ /app/data/
+COPY logs/ /app/logs/
+
+# Expose backend port
+EXPOSE 8000
+
+ENV PYTHONPATH=/app
+
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

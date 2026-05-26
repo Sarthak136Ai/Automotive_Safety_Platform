@@ -1,0 +1,42 @@
+[
+    {
+        "sample_index": 0,
+        "predicted_risk_contributors": [
+            0,
+            1,
+            2
+        ]
+    },
+    {
+        "sample_index": 1,
+        "predicted_risk_contributors": [
+            0,
+            1,
+            2
+        ]
+    },
+    {
+        "sample_index": 2,
+        "predicted_risk_contributors": [
+            0,
+            1,
+            2
+        ]
+    },
+    {
+        "sample_index": 3,
+        "predicted_risk_contributors": [
+            0,
+            1,
+            2
+        ]
+    },
+    {
+        "sample_index": 4,
+        "predicted_risk_contributors": [
+            0,
+            1,
+            2
+        ]
+    }
+]

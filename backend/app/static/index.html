@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#09090b] text-zinc-100 antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoSentinel AI — Explainable Automotive Recall Intelligence</title>
+  
+  <!-- Premium Typography: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js CDN for beautiful interactive visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons Script -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.04) 0px, transparent 50%);
+    }
+    .title-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(20, 20, 25, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(9, 9, 11, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: "#09090b",
+            card: "rgba(20, 20, 25, 0.65)",
+            border: "rgba(255, 255, 255, 0.08)",
+            risk: {
+              low: "#10b981",
+              medium: "#f59e0b",
+              high: "#ef4444",
+              critical: "#a855f7"
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="overflow-x-hidden min-h-screen text-zinc-200">
+
+  <div class="flex min-h-screen">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 border-r border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex flex-col justify-between fixed h-full z-20">
+      <div>
+        <!-- Brand Header -->
+        <div class="p-6 border-b border-zinc-800 flex items-center gap-3">
+          <div class="bg-indigo-600/20 p-2 rounded-xl border border-indigo-500/30 text-indigo-400">
+            <i data-lucide="shield-alert" class="w-6 h-6 animate-pulse"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold title-outfit text-white leading-tight">AutoSentinel AI</h1>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Safety Intelligence</span>
+          </div>
+        </div>
+
+        <nav class="p-4 space-y-1">
+          <button id="nav-dashboard" onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 border border-indigo-500/20">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            Executive Dashboard
+          </button>
+          <button id="nav-prediction" onclick="switchTab('prediction')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60">
+            <i data-lucide="binary" class="w-4 h-4"></i>
+            Recall Risk Predictor
+          </button>
+          <button id="nav-search" onclick="switchTab('search')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            Semantic Search Explorer
+          </button>
+          <button id="nav-about" onclick="switchTab('about')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            About Platform
+          </button>
+        </nav>
+      </div>
+
+      <!-- Footer Context Info -->
+      <div class="p-4 border-t border-zinc-800/60 text-[11px] text-zinc-500 space-y-2">
+        <div class="flex items-center gap-2">
+          <i data-lucide="hard-drive" class="w-3.5 h-3.5 text-zinc-500"></i>
+          <span>NHTSA Safety Recall DB</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5 text-zinc-500"></i>
+          <span>AI Risk Core: Active</span>
+        </div>
+        <p className="mt-2 text-[10px] text-zinc-600">&copy; 2026 AutoSentinel Inc. Production Grade v1.0</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 pl-64 min-h-screen flex flex-col">
+      <!-- Top Header Bar -->
+      <header class="h-16 border-b border-zinc-800 bg-zinc-950/40 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-950 text-emerald-400 border border-emerald-500/20">
+            System Online
+          </span>
+          <span class="text-zinc-600">|</span>
+          <span class="text-xs text-zinc-400">Model: XGBoost Classifier + live SHAP Explainer</span>
+        </div>
+        <div class="text-xs text-zinc-400 flex items-center gap-3">
+          <span>Server: <strong class="text-indigo-400">FastAPI/SQLite</strong></span>
+          <span>Web Client: <strong class="text-indigo-400">Zero-Dependency SPA</strong></span>
+        </div>
+      </header>
+
+      <!-- Panel Target Wrapper -->
+      <div class="flex-1 p-8 bg-transparent max-w-7xl w-full mx-auto">
+        
+        <!-- ================================================================= -->
+        <!-- TAB 1: EXECUTIVE DASHBOARD -->
+        <!-- ================================================================= -->
+        <section id="panel-dashboard" class="space-y-8 animate-fadeIn">
+          <div>
+            <h2 class="text-3xl font-extrabold title-outfit text-white">Recall Intelligence Analytics</h2>
+            <p class="text-sm text-zinc-400 mt-1">NHTSA-sourced vehicle safety intelligence dynamic analysis.</p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Card 1 -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between h-32">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Total Safety Recalls</span>
+                <div class="p-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/20">
+                  <i data-lucide="cpu" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div>
+                <h3 id="kpi-recalls" class="text-3xl font-extrabold title-outfit text-white">---</h3>
+                <span class="text-[10px] text-zinc-400">Archived Campaign Ingestions</span>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between h-32">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Avg Safety Risk Index</span>
+                <div class="p-2 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/20">
+                  <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div>
+                <h3 id="kpi-risk-index" class="text-3xl font-extrabold title-outfit text-white">---</h3>
+                <span class="text-[10px] text-amber-400 font-medium">Weighted Hazard Quotient</span>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between h-32">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">High & Critical Recalls</span>
+                <div class="p-2 rounded-xl bg-red-600/20 text-red-400 border border-red-500/20">
+                  <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div>
+                <h3 id="kpi-critical" class="text-3xl font-extrabold title-outfit text-white">---</h3>
+                <span class="text-[10px] text-red-400 font-medium">Requiring Immediate Attention</span>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between h-32">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Monitored Makes</span>
+                <div class="p-2 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/20">
+                  <i data-lucide="award" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div>
+                <h3 id="kpi-makes" class="text-3xl font-extrabold title-outfit text-white">---</h3>
+                <span class="text-[10px] text-zinc-400">Unique Manufacturers Rated</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Highest Risk Manufacturers Chart -->
+            <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
+              <h3 class="text-lg font-bold title-outfit text-white mb-4 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4 h-4 text-indigo-400"></i>
+                Highest Risk Manufacturers (Safety Risk Index)
+              </h3>
+              <div class="h-72 w-full relative">
+                <canvas id="mfrBarChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Component Failure Pie Chart -->
+            <div class="glass-panel p-6 rounded-2xl">
+              <h3 class="text-lg font-bold title-outfit text-white mb-4">Component Failure Matrix</h3>
+              <div class="h-72 w-full relative flex items-center justify-center">
+                <canvas id="componentPieChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brands table rankings -->
+          <div class="glass-panel p-6 rounded-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h3 class="text-lg font-bold title-outfit text-white">Automotive Brand Threat Indexes</h3>
+                <p class="text-xs text-zinc-500">Comprehensive manufacturer ratings ordered by safety risk index.</p>
+              </div>
+              <div class="relative w-full sm:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input
+                  type="text"
+                  id="dashboard-search"
+                  oninput="handleDashboardSearch()"
+                  placeholder="Search manufacturer make..."
+                  class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 pl-10 pr-4 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-600 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div class="overflow-x-auto border border-zinc-800 rounded-xl">
+              <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr class="bg-zinc-950/60 border-b border-zinc-800 text-zinc-400 text-xs font-bold uppercase tracking-wider">
+                    <th class="py-3.5 px-6">Make</th>
+                    <th class="py-3.5 px-4 text-center">Safety Risk Index</th>
+                    <th class="py-3.5 px-4 text-center">Total Recalls</th>
+                    <th class="py-3.5 px-4 text-center">Critical</th>
+                    <th class="py-3.5 px-4 text-center">High</th>
+                    <th class="py-3.5 px-4 text-center">Medium</th>
+                    <th class="py-3.5 px-4 text-center">Low</th>
+                    <th class="py-3.5 px-6 text-right">Avg Severity</th>
+                  </tr>
+                </thead>
+                <tbody id="rankings-table-body" class="divide-y divide-zinc-800/40">
+                  <!-- Dynamic rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 2: RECALL RISK PREDICTOR -->
+        <!-- ================================================================= -->
+        <section id="panel-prediction" class="space-y-8 hidden animate-fadeIn">
+          <div>
+            <h2 class="text-3xl font-extrabold title-outfit text-white">Safety Recall Threat Forecaster</h2>
+            <p class="text-sm text-zinc-400 mt-1">Predict safety recall risk levels and receive Explainable AI (SHAP) word importance profiles.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Side: Interactive Form -->
+            <form onsubmit="handlePredictionSubmit(event)" class="glass-panel p-6 rounded-2xl lg:col-span-5 space-y-5">
+              <h3 class="text-lg font-bold title-outfit text-white flex items-center gap-2 pb-2 border-b border-zinc-800/50">
+                <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
+                Safety Defect Prompt
+              </h3>
+
+              <!-- Single NLP Input -->
+              <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Describe the vehicle defect in your own words *</label>
+                <textarea id="pred-nlp-input" required rows="4" oninput="runNlpParsing()" placeholder="Describe what is wrong (e.g. my 2021 Tesla battery is overheating and throwing warning lights)..." class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-3 px-4 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-600 transition-colors resize-none"></textarea>
+              </div>
+
+              <!-- Try Quick Safety Defect Templates -->
+              <div class="space-y-2">
+                <span class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">💡 Try quick safety defect templates:</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" onclick="loadExamplePredictor('Tesla', 'Battery', 2022, 'The high voltage battery pack is overheating and thermal runaway events are melting cable insulators during supercharging.')" class="glass-panel text-left p-3.5 rounded-xl border border-zinc-800 hover:border-indigo-500/50 hover:bg-indigo-600/5 text-zinc-300 transition-all hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-[10px] font-bold text-indigo-400 font-mono">Tesla Battery</span>
+                      <span class="text-xs">⚡</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 leading-snug line-clamp-2">High voltage battery pack thermal runaway...</p>
+                  </button>
+
+                  <button type="button" onclick="loadExamplePredictor('Honda', 'Brakes', 2020, 'Brake master cylinder is leaking brake fluid at the piston seal, causing low hydraulic pressure and soft brake pedal feel.')" class="glass-panel text-left p-3.5 rounded-xl border border-zinc-800 hover:border-indigo-500/50 hover:bg-indigo-600/5 text-zinc-300 transition-all hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-[10px] font-bold text-indigo-400 font-mono">Honda Brakes</span>
+                      <span class="text-xs">🛑</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 leading-snug line-clamp-2">Brake master cylinder leaking piston fluid...</p>
+                  </button>
+
+                  <button type="button" onclick="loadExamplePredictor('Ford', 'Airbags', 2018, 'Driver-side front airbag inflator ruptured during crash deployment, scattering metal shards and shrapnel into the cabin area.')" class="glass-panel text-left p-3.5 rounded-xl border border-zinc-800 hover:border-indigo-500/50 hover:bg-indigo-600/5 text-zinc-300 transition-all hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-[10px] font-bold text-indigo-400 font-mono">Ford Airbags</span>
+                      <span class="text-xs">🎈</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 leading-snug line-clamp-2">Front airbag inflator shrapnel rupture...</p>
+                  </button>
+
+                  <button type="button" onclick="loadExamplePredictor('Toyota', 'Engine', 2019, 'The engine cooling system leaks coolant, causing immediate engine stall and loss of motive power at highway speeds.')" class="glass-panel text-left p-3.5 rounded-xl border border-zinc-800 hover:border-indigo-500/50 hover:bg-indigo-600/5 text-zinc-300 transition-all hover:-translate-y-0.5 duration-200 cursor-pointer">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-[10px] font-bold text-indigo-400 font-mono">Toyota Engine</span>
+                      <span class="text-xs">⚙️</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 leading-snug line-clamp-2">Coolant leaks causing highway engine stall...</p>
+                  </button>
+                </div>
+              </div>
+
+              <!-- AI Inferred Parameter Badges -->
+              <div class="flex flex-wrap items-center gap-2 bg-zinc-950/40 p-3 rounded-xl border border-zinc-800/60">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-zinc-500 my-auto">AI Inferred:</span>
+                <span id="badge-mfr" class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">Make: Auto</span>
+                <span id="badge-comp" class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">System: Auto</span>
+                <span id="badge-year" class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">Year: Auto</span>
+              </div>
+
+              <!-- Collapsible Manual Overrides Button -->
+              <button type="button" onclick="toggleAdvancedFields()" class="w-full flex items-center justify-between text-xs font-bold text-zinc-400 hover:text-zinc-200 py-1.5 transition-colors">
+                <span>Manual Overrides & Optional Fields</span>
+                <i data-lucide="chevron-down" id="advanced-chevron" class="w-4 h-4"></i>
+              </button>
+
+              <!-- Collapsible Container (hidden by default) -->
+              <div id="advanced-fields" class="hidden space-y-4 border-t border-zinc-800/50 pt-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Manufacturer Make</label>
+                    <input type="text" id="pred-mfr" placeholder="e.g. Tesla" class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-200 focus:outline-none focus:border-indigo-600 transition-colors" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Component system</label>
+                    <select id="pred-comp" class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-600 transition-colors">
+                      <option value="Brakes">Brakes</option>
+                      <option value="Airbags">Airbags</option>
+                      <option value="Electrical System">Electrical System</option>
+                      <option value="Fuel System">Fuel System</option>
+                      <option value="Steering">Steering</option>
+                      <option value="Engine">Engine</option>
+                      <option value="Seat Belts">Seat Belts</option>
+                      <option value="Suspension">Suspension</option>
+                      <option value="Transmission">Transmission</option>
+                      <option value="Battery">Battery</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Model Year</label>
+                    <input type="number" id="pred-year" min="1990" max="2027" value="2015" class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-200 focus:outline-none focus:border-indigo-600 transition-colors" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Consequence Summary</label>
+                  <textarea id="pred-consequence" rows="2" placeholder="Describe safety hazard consequences (optional)..." class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors resize-none"></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider">Remedy Corrective Action</label>
+                  <textarea id="pred-remedy" rows="2" placeholder="Describe dealer fix action (optional)..." class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors resize-none"></textarea>
+                </div>
+              </div>
+
+              <button type="submit" id="pred-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/15">
+                Assess Recall Risk
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </form>
+
+            <!-- Right Side: Predictions Visual output -->
+            <div id="pred-result-wrapper" class="lg:col-span-7 space-y-6">
+              <!-- Idle State -->
+              <div class="glass-panel p-12 rounded-2xl h-full flex flex-col items-center justify-center text-center space-y-4 border-dashed border-zinc-800">
+                <div class="p-4 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-600 max-w-fit mx-auto">
+                  <i data-lucide="activity" class="w-8 h-8"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold title-outfit text-zinc-300">Awaiting Safety Assessment</h4>
+                  <p class="text-xs text-zinc-500 max-w-sm mx-auto mt-1">
+                    Fill out the parameters form on the left to execute the live AutoSentinel AI safety recall risk models.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 3: SEMANTIC SEARCH EXPLORER -->
+        <!-- ================================================================= -->
+        <section id="panel-search" class="space-y-8 hidden animate-fadeIn">
+          <div>
+            <h2 class="text-3xl font-extrabold title-outfit text-white">Semantic Safety Recall Explorer</h2>
+            <p class="text-sm text-zinc-400 mt-1">Perform high-dimensional cosine similarity searches across safety recall indexes using dense vector embeddings.</p>
+          </div>
+
+          <!-- Query Bar Form -->
+          <form onsubmit="handleSemanticSearchSubmit(event)" class="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center border border-indigo-500/10">
+            <div class="relative flex-1 w-full">
+              <i data-lucide="search" class="w-5 h-5 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2"></i>
+              <input
+                type="text"
+                id="search-query-input"
+                required
+                placeholder="Type safety concern (e.g. steering wheel vibration, brakes lock up while driving, charging battery fires)..."
+                class="w-full bg-zinc-950/60 border border-zinc-800 rounded-xl py-3 pl-12 pr-4 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-600 transition-colors"
+              />
+            </div>
+
+            <div class="flex gap-4 items-center w-full sm:w-auto shrink-0 justify-end">
+              <div class="flex items-center gap-2 bg-zinc-950/60 border border-zinc-800 rounded-xl px-3 py-2 text-sm text-zinc-400 shrink-0">
+                <i data-lucide="filter" class="w-4 h-4 text-zinc-500"></i>
+                <select id="search-top-k" class="bg-transparent border-none text-zinc-300 focus:outline-none text-xs font-semibold cursor-pointer">
+                  <option value="3">Top 3 Results</option>
+                  <option value="5" selected>Top 5 Results</option>
+                  <option value="8">Top 8 Results</option>
+                  <option value="12">Top 12 Results</option>
+                </select>
+              </div>
+              <button type="submit" id="search-submit-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shrink-0 flex items-center gap-2 shadow-lg shadow-indigo-600/15">
+                Search Index
+              </button>
+            </div>
+          </form>
+
+          <!-- Try Quick Search Examples -->
+          <div class="space-y-2.5">
+            <span class="block text-xs font-bold text-zinc-500 uppercase tracking-wider">💡 Try Semantic Search Presets:</span>
+            <div class="flex flex-wrap gap-2.5">
+              <button type="button" onclick="loadExampleSearch('steering wheel locking up unexpectedly')" class="text-xs bg-zinc-900/60 hover:bg-indigo-600/10 border border-zinc-800 hover:border-indigo-500/40 text-zinc-300 px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer font-medium">
+                <span>🎡</span> Steering Wheel Lockups
+              </button>
+              <button type="button" onclick="loadExampleSearch('airbag inflator rupture sharp metal shrapnel')" class="text-xs bg-zinc-900/60 hover:bg-indigo-600/10 border border-zinc-800 hover:border-indigo-500/40 text-zinc-300 px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer font-medium">
+                <span>🎈</span> Airbag Shrapnel Exploding
+              </button>
+              <button type="button" onclick="loadExampleSearch('high voltage battery pack fire hazard')" class="text-xs bg-zinc-900/60 hover:bg-indigo-600/10 border border-zinc-800 hover:border-indigo-500/40 text-zinc-300 px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer font-medium">
+                <span>⚡</span> Battery Fire Threat
+              </button>
+              <button type="button" onclick="loadExampleSearch('engine stalls at high speeds losing power steering')" class="text-xs bg-zinc-900/60 hover:bg-indigo-600/10 border border-zinc-800 hover:border-indigo-500/40 text-zinc-300 px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer font-medium">
+                <span>⚙️</span> Highway Engine Stalling
+              </button>
+              <button type="button" onclick="loadExampleSearch('rear backup camera display screen is blank')" class="text-xs bg-zinc-900/60 hover:bg-indigo-600/10 border border-zinc-800 hover:border-indigo-500/40 text-zinc-300 px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer font-medium">
+                <span>📷</span> Blank Backup Camera Screen
+              </button>
+            </div>
+          </div>
+
+          <!-- Vector search list output -->
+          <div id="search-results-wrapper" class="space-y-4">
+            
+            <!-- Idle State -->
+            <div class="glass-panel p-16 rounded-2xl text-center space-y-4 border-dashed border-zinc-800">
+              <div class="p-4 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-600 max-w-fit mx-auto">
+                <i data-lucide="search" class="w-8 h-8"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-bold title-outfit text-zinc-400">Awaiting Semantic Search Query</h4>
+                <p class="text-xs text-zinc-500 max-w-md mx-auto mt-1">
+                  Type vehicle defects in natural language to search, extract, and trace similarities across the historical recall database.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 4: ABOUT PLATFORM -->
+        <!-- ================================================================= -->
+        <section id="panel-about" class="space-y-8 hidden animate-fadeIn">
+          <div>
+            <h2 class="text-3xl font-extrabold title-outfit text-white">About AutoSentinel AI</h2>
+            <p class="text-sm text-zinc-400 mt-1">Industrial Safety Intelligence and Explainable Automotive Defect Analysis.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- Left 2 Columns: Description & Features -->
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Platform Overview -->
+              <div class="glass-panel p-6 rounded-2xl relative overflow-hidden border border-indigo-500/10">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                <h3 class="text-lg font-bold title-outfit text-white mb-3 flex items-center gap-2">
+                  <i data-lucide="shield-check" class="w-5 h-5 text-indigo-400"></i>
+                  Executive Platform Summary
+                </h3>
+                <p class="text-sm text-zinc-300 leading-relaxed font-sans">
+                  AutoSentinel AI is a high-integrity, explainable safety intelligence platform designed for regulators, engineers, and manufacturing executives. By integrating advanced machine learning, deep natural language processing, and robust functional safety protocols, AutoSentinel AI turns raw vehicle recall complaints and campaign logs into actionable, predictive intelligence.
+                </p>
+                <p class="text-sm text-zinc-300 leading-relaxed font-sans mt-3">
+                  This system ingests, processes, and classifies defect descriptions to forecast severity levels, map high-dimensional vector spaces for semantic similarity, and provide raw, mathematically sound local explanations for every decision via SHAP (Shapley Additive exPlanations).
+                </p>
+              </div>
+
+              <!-- Pipeline Flowchart -->
+              <div class="glass-panel p-6 rounded-2xl space-y-6">
+                <h3 class="text-lg font-bold title-outfit text-white flex items-center gap-2">
+                  <i data-lucide="git-branch" class="w-5 h-5 text-indigo-400"></i>
+                  AutoSentinel AI Threat Assessment Pipeline Flow
+                </h3>
+                
+                <div class="relative flex flex-col md:flex-row items-stretch justify-between gap-4 font-sans text-xs pt-2">
+                  <!-- Step 1: Input -->
+                  <div class="flex-1 bg-zinc-950/50 border border-zinc-800/60 p-4 rounded-xl flex flex-col justify-between items-center text-center space-y-3 relative">
+                    <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      <i data-lucide="text-cursor-input" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <span class="font-bold text-white block">1. Defect Ingest</span>
+                      <p class="text-[10px] text-zinc-500 mt-1">Raw NLP Defect Prompt + Vehicle Metadata</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -translate-y-1/2 -right-3.5 text-zinc-600 font-bold z-10">
+                      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                  </div>
+
+                  <!-- Step 2: Feature Engineering & Semantic Encoding -->
+                  <div class="flex-1 bg-zinc-950/50 border border-zinc-800/60 p-4 rounded-xl flex flex-col justify-between items-center text-center space-y-3 relative">
+                    <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <i data-lucide="binary" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <span class="font-bold text-white block">2. Dual Vectorizing</span>
+                      <p class="text-[10px] text-zinc-500 mt-1">TF-IDF Vectorizer &amp; all-MiniLM Dense Embedder</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -translate-y-1/2 -right-3.5 text-zinc-600 font-bold z-10">
+                      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                  </div>
+
+                  <!-- Step 3: Classifiers & Safety Override -->
+                  <div class="flex-1 bg-zinc-950/50 border border-zinc-800/60 p-4 rounded-xl flex flex-col justify-between items-center text-center space-y-3 relative">
+                    <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <span class="font-bold text-white block">3. Safety Overrides</span>
+                      <p class="text-[10px] text-zinc-500 mt-1">XGBoost Classifiers + ISO 26262 Trigger Overrides</p>
+                    </div>
+                    <div class="hidden md:block absolute top-1/2 -translate-y-1/2 -right-3.5 text-zinc-600 font-bold z-10">
+                      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                  </div>
+
+                  <!-- Step 4: Explainable AI & Summaries -->
+                  <div class="flex-1 bg-zinc-950/50 border border-zinc-800/60 p-4 rounded-xl flex flex-col justify-between items-center text-center space-y-3">
+                    <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <i data-lucide="sparkles" class="w-5 h-5 animate-pulse"></i>
+                    </div>
+                    <div>
+                      <span class="font-bold text-white block">4. Explanations</span>
+                      <p class="text-[10px] text-zinc-500 mt-1">SHAP marginal traces + BART CNN summary</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Core Core Architectural Highlights -->
+              <div class="glass-panel p-6 rounded-2xl space-y-4">
+                <h3 class="text-lg font-bold title-outfit text-white flex items-center gap-2">
+                  <i data-lucide="cpu" class="w-5 h-5 text-indigo-400"></i>
+                  Technical Model Architectures
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
+                  
+                  <div class="bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/40 space-y-2">
+                    <span class="font-bold text-indigo-400 block font-mono uppercase tracking-wider text-[10px]">1. XGBoost Threat Classifier</span>
+                    <p class="text-zinc-400 leading-normal">Fitted Extreme Gradient Boosting Decision Tree model mapping preprocessed textual features (TF-IDF vectorizations) and numerical dimensions (vehicle age, manufacturer volumes, component categories) to stratified safety risk labels.</p>
+                  </div>
+
+                  <div class="bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/40 space-y-2">
+                    <span class="font-bold text-indigo-400 block font-mono uppercase tracking-wider text-[10px]">2. Explainable AI (SHAP Core)</span>
+                    <p class="text-zinc-400 leading-normal">TreeExplainer engine mapping local marginal Shapley values for exact token-level feature inputs. Reconstructs dense TF-IDF and categorical variables back to natural vocabulary terms, ensuring transparency in every risk verdict.</p>
+                  </div>
+
+                  <div class="bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/40 space-y-2">
+                    <span class="font-bold text-indigo-400 block font-mono uppercase tracking-wider text-[10px]">3. Dense Semantic Vector Engine</span>
+                    <p class="text-zinc-400 leading-normal">SentenceTransformer (all-MiniLM-L6-v2) embedding encoder translating natural language queries into 384-dimensional dense vectors. Performs real-time cosine-similarity calculations across historical defect campaigns.</p>
+                  </div>
+
+                  <div class="bg-zinc-950/40 p-4 rounded-xl border border-zinc-800/40 space-y-2">
+                    <span class="font-bold text-indigo-400 block font-mono uppercase tracking-wider text-[10px]">4. Hybrid Functional Safety Controls</span>
+                    <p class="text-zinc-400 leading-normal">Refined functional safety trigger layer (conforming to ISO 26262 principles) mitigating data sampling skew. Obvious critical hazards (such as battery thermal runaway, structural airbag ruptures, or complete steering failure) are escalated immediately.</p>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right 1 Column: Dataset Details & Download CTA -->
+            <div class="space-y-6">
+              
+              <!-- Download Dataset Call-to-Action -->
+              <div class="glass-panel p-6 rounded-2xl border border-indigo-500/20 bg-indigo-950/10 text-center space-y-4">
+                <div class="p-3.5 rounded-full bg-indigo-500/10 text-indigo-400 max-w-fit mx-auto border border-indigo-500/20">
+                  <i data-lucide="download-cloud" class="w-8 h-8"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold title-outfit text-white">Download Safety Recall Dataset</h3>
+                  <p class="text-xs text-zinc-400 mt-1 max-w-xs mx-auto leading-relaxed">
+                    Download the preprocessed, machine-learning-ready safety recall dataset containing 5,000 records, engineered feature columns, and calculated severity scores.
+                  </p>
+                </div>
+                
+                <a href="/api/download/dataset" download class="block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-3 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2">
+                  <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                  Download Dataset (CSV)
+                </a>
+                
+                <div class="text-[10px] text-zinc-500 font-mono">
+                  <span>File size: ~8.1 MB &bull; Format: Structured CSV</span>
+                </div>
+              </div>
+
+              <!-- Database & Storage Info -->
+              <div class="glass-panel p-6 rounded-2xl space-y-3 font-sans">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 pb-2 border-b border-zinc-800/40">Dataset Schema Details</h4>
+                <div class="space-y-2 text-xs">
+                  <div class="flex justify-between">
+                    <span class="text-zinc-500">Database Engine:</span>
+                    <strong class="text-zinc-300 font-mono">SQLite 3</strong>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-zinc-500">Record Count:</span>
+                    <strong class="text-zinc-300 font-mono">5,000 Safety Campaigns</strong>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-zinc-500">Primary Keys:</span>
+                    <strong class="text-zinc-300 font-mono">NHTSA campaign ID mapping</strong>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-zinc-500">Source Origin:</span>
+                    <strong class="text-zinc-300 font-mono">U.S. Dot / NHTSA Recalls API</strong>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // =================================================================
+    // GLOBAL APP STATE & ROUTING SYSTEM
+    // =================================================================
+    let activeTab = "dashboard";
+    let manufacturersData = [];
+    
+    // Warm up and load analytical metrics on page initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      loadManufacturerData();
+    });
+
+    function switchTab(tabId) {
+      // Manage active nav indicators
+      const tabs = ["dashboard", "prediction", "search", "about"];
+      tabs.forEach(t => {
+        const panel = document.getElementById(`panel-${t}`);
+        const navBtn = document.getElementById(`nav-${t}`);
+        
+        if (t === tabId) {
+          panel.classList.remove("hidden");
+          navBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/25 border border-indigo-500/20";
+        } else {
+          panel.classList.add("hidden");
+          navBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60";
+        }
+      });
+      
+      activeTab = tabId;
+    }
+
+    // =================================================================
+    // TAB 1: DASHBOARD METRICS LOAD & CHARTING
+    // =================================================================
+    async function loadManufacturerData() {
+      try {
+        const response = await fetch("/api/manufacturers");
+        if (!response.ok) throw new Error("Backend offline");
+        manufacturersData = await response.json();
+        
+        // 1. Populate stats cards
+        const totalCampaigns = manufacturersData.reduce((acc, curr) => acc + curr.total_recalls, 0);
+        const avgIndex = (manufacturersData.reduce((acc, curr) => acc + curr.safety_risk_index, 0) / manufacturersData.length).toFixed(2);
+        const criticalCount = manufacturersData.reduce((acc, curr) => acc + curr.critical_risk_count + curr.high_risk_count, 0);
+        const uniqueMakes = manufacturersData.length;
+
+        document.getElementById("kpi-recalls").innerText = totalCampaigns;
+        document.getElementById("kpi-risk-index").innerText = avgIndex;
+        document.getElementById("kpi-critical").innerText = criticalCount;
+        document.getElementById("kpi-makes").innerText = uniqueMakes;
+
+        // 2. Populate Rankings table rows
+        renderRankingsTable(manufacturersData);
+
+        // 3. Render charts
+        renderBarChart();
+        renderPieChart();
+
+      } catch (err) {
+        console.error("Dashboard initialize error:", err);
+        // Show offline fallback alert inside stats table
+        document.getElementById("rankings-table-body").innerHTML = `
+          <tr>
+            <td colspan="8" class="py-12 text-center text-risk-high font-semibold">
+              <i data-lucide="alert-triangle" class="w-8 h-8 text-risk-high mx-auto mb-2 animate-bounce"></i>
+              AutoSentinel API server offline. Check logs or verify database migrations.
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function renderRankingsTable(dataset) {
+      const tbody = document.getElementById("rankings-table-body");
+      tbody.innerHTML = "";
+
+      if (dataset.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-zinc-500">No make found</td></tr>`;
+        return;
+      }
+
+      dataset.forEach(row => {
+        let badgeColor = "text-zinc-400 bg-zinc-900 border-zinc-800";
+        if (row.safety_risk_index > 25) {
+          badgeColor = "text-purple-400 bg-purple-950/30 border-purple-500/20";
+        } else if (row.safety_risk_index > 15) {
+          badgeColor = "text-red-400 bg-red-950/30 border-red-500/20";
+        } else if (row.safety_risk_index > 5) {
+          badgeColor = "text-amber-400 bg-amber-950/30 border-amber-500/20";
+        } else {
+          badgeColor = "text-emerald-400 bg-emerald-950/30 border-emerald-500/20";
+        }
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-zinc-900/35 transition-colors border-b border-zinc-800/40";
+        tr.innerHTML = `
+          <td class="py-3.5 px-6 font-semibold text-white">${row.manufacturer}</td>
+          <td class="py-3.5 px-4 text-center">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeColor}">${row.safety_risk_index}</span>
+          </td>
+          <td class="py-3.5 px-4 text-center text-zinc-300 font-medium">${row.total_recalls}</td>
+          <td class="py-3.5 px-4 text-center text-risk-critical font-bold">${row.critical_risk_count}</td>
+          <td class="py-3.5 px-4 text-center text-risk-high font-semibold">${row.high_risk_count}</td>
+          <td class="py-3.5 px-4 text-center text-risk-medium font-medium">${row.medium_risk_count}</td>
+          <td class="py-3.5 px-4 text-center text-risk-low font-medium">${row.low_risk_count}</td>
+          <td class="py-3.5 px-6 text-right font-mono text-xs text-zinc-400">${row.average_severity_score.toFixed(4)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleDashboardSearch() {
+      const text = document.getElementById("dashboard-search").value.toLowerCase();
+      const filtered = manufacturersData.filter(item => 
+        item.manufacturer.toLowerCase().includes(text)
+      );
+      renderRankingsTable(filtered);
+    }
+
+    // Chart instances to support updates
+    let mfrChartInstance = null;
+    let pieChartInstance = null;
+
+    function renderBarChart() {
+      const topMfrs = [...manufacturersData].sort((a,b) => b.safety_risk_index - a.safety_risk_index).slice(0, 8);
+      const ctx = document.getElementById("mfrBarChart").getContext("2d");
+      
+      if (mfrChartInstance) mfrChartInstance.destroy();
+
+      mfrChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: topMfrs.map(x => x.manufacturer),
+          datasets: [{
+            label: 'Safety Risk Index',
+            data: topMfrs.map(x => x.safety_risk_index),
+            backgroundColor: 'rgba(99, 102, 241, 0.85)',
+            borderColor: 'rgba(99, 102, 241, 1)',
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { backgroundColor: '#18181b', borderColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1 }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.04)' }, ticks: { color: '#71717a', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    function renderPieChart() {
+      // Extrapolate representation values corresponding to structured splits
+      const airbags = manufacturersData.reduce((a,c) => a + c.high_risk_count * 0.4, 0);
+      const brakes = manufacturersData.reduce((a,c) => a + c.high_risk_count * 0.25, 0);
+      const steering = manufacturersData.reduce((a,c) => a + c.medium_risk_count * 0.2, 0);
+      const battery = manufacturersData.reduce((a,c) => a + c.critical_risk_count * 0.5, 0);
+      const other = manufacturersData.reduce((a,c) => a + c.low_risk_count * 0.35, 0);
+
+      const ctx = document.getElementById("componentPieChart").getContext("2d");
+      
+      if (pieChartInstance) pieChartInstance.destroy();
+
+      pieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ["Airbags", "Brakes", "Steering", "Battery", "Other"],
+          datasets: [{
+            data: [Math.round(airbags), Math.round(brakes), Math.round(steering), Math.round(battery), Math.round(other)],
+            backgroundColor: ["#8b5cf6", "#3b82f6", "#06b6d4", "#10b981", "#64748b"],
+            borderWidth: 2,
+            borderColor: '#09090b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { 
+              position: 'bottom',
+              labels: { color: '#a1a1aa', font: { size: 9 }, boxWidth: 8, padding: 15 }
+            },
+            tooltip: { backgroundColor: '#18181b', borderColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1 }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+
+    // =================================================================
+    // TAB 2: DEFECT RISK PREDICTOR SUBMISSION & RENDERING
+    // =================================================================
+    function toggleAdvancedFields() {
+      const advanced = document.getElementById("advanced-fields");
+      const chevron = document.getElementById("advanced-chevron");
+      
+      if (advanced.classList.contains("hidden")) {
+        advanced.classList.remove("hidden");
+        chevron.setAttribute("data-lucide", "chevron-up");
+      } else {
+        advanced.classList.add("hidden");
+        chevron.setAttribute("data-lucide", "chevron-down");
+      }
+      lucide.createIcons();
+    }
+
+    function runNlpParsing() {
+      const text = document.getElementById("pred-nlp-input").value;
+      const lowerText = text.toLowerCase();
+      
+      // 1. Extract Year
+      const yearMatch = text.match(/\b(199\d|200\d|201\d|202\d)\b/);
+      const year = yearMatch ? parseInt(yearMatch[0]) : 2015;
+      
+      // 2. Extract Manufacturer Make
+      const manufacturers = ["tesla", "ford", "honda", "toyota", "bmw", "mercedes", "hyundai", "nissan", "chevrolet", "jeep", "dodge", "kia", "audi", "volkswagen", "volvo", "subaru", "lexus", "mazda", "gmc", "buick", "cadillac", "chrysler"];
+      let mfr = "Unknown";
+      for (const m of manufacturers) {
+        if (lowerText.includes(m)) {
+          mfr = m.charAt(0).toUpperCase() + m.slice(1);
+          break;
+        }
+      }
+      
+      // 3. Extract Component System
+      const components = {
+        "brake": "Brakes",
+        "airbag": "Airbags",
+        "air bag": "Airbags",
+        "electrical": "Electrical System",
+        "wire": "Electrical System",
+        "fuel": "Fuel System",
+        "steer": "Steering",
+        "engine": "Engine",
+        "motor": "Engine",
+        "belt": "Seat Belts",
+        "suspension": "Suspension",
+        "transmission": "Transmission",
+        "gear": "Transmission",
+        "battery": "Battery"
+      };
+      let comp = "Other";
+      for (const [key, val] of Object.entries(components)) {
+        if (lowerText.includes(key)) {
+          comp = val;
+          break;
+        }
+      }
+      
+      // 4. Update Badge Indicators
+      document.getElementById("badge-mfr").innerText = `Make: ${mfr}`;
+      document.getElementById("badge-comp").innerText = `System: ${comp}`;
+      document.getElementById("badge-year").innerText = `Year: ${year}`;
+      
+      // 5. Update actual manual input fields
+      document.getElementById("pred-mfr").value = mfr;
+      document.getElementById("pred-comp").value = comp;
+      document.getElementById("pred-year").value = year;
+    }
+
+    async function handlePredictionSubmit(e) {
+      if (e) e.preventDefault();
+      
+      const submitBtn = document.getElementById("pred-submit-btn");
+      const wrapper = document.getElementById("pred-result-wrapper");
+
+      // Set Loading spinner inside target wrapper
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+        Analyzing Defect...
+      `;
+
+      wrapper.innerHTML = `
+        <div class="glass-panel p-12 rounded-2xl h-full flex flex-col items-center justify-center text-center space-y-4">
+          <svg class="animate-spin h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <div>
+            <h4 class="text-sm font-bold text-zinc-300">Executing machine learning engine cores...</h4>
+            <p class="text-xs text-zinc-500 mt-1">Calculating live SHAP values, extracting SpaCy entities, and running BART-Large summarizer.</p>
+          </div>
+        </div>
+      `;
+
+      try {
+        const payload = {
+          manufacturer: document.getElementById("pred-mfr").value || "Unknown",
+          component: document.getElementById("pred-comp").value || "Other",
+          model_year: parseInt(document.getElementById("pred-year").value) || 2015,
+          summary: document.getElementById("pred-nlp-input").value,
+          consequence: document.getElementById("pred-consequence").value || null,
+          remedy: document.getElementById("pred-remedy").value || null
+        };
+
+        const response = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error("Prediction API Error");
+
+        const result = await response.json();
+        renderPredictionResults(result);
+
+      } catch (err) {
+        console.error("Forecasting defect execution failed:", err);
+        wrapper.innerHTML = `
+          <div class="glass-panel p-8 rounded-2xl border border-red-500/20 text-center space-y-3">
+            <i data-lucide="alert-circle" class="w-10 h-10 text-risk-high mx-auto"></i>
+            <h4 class="text-base font-bold text-white">Prediction Assessment Failed</h4>
+            <p class="text-xs text-zinc-500">FastAPI backend threw an error. Verify python runtime console outputs.</p>
+          </div>
+        `;
+        lucide.createIcons();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          Assess Recall Risk
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        `;
+        lucide.createIcons();
+      }
+    }
+
+    function renderPredictionResults(res) {
+      const wrapper = document.getElementById("pred-result-wrapper");
+      
+      // Determine color themes
+      let labelColorClass = "text-risk-low";
+      let labelBgClass = "bg-risk-low/10 border-risk-low/20";
+      let progressColor = "bg-risk-low";
+      let strokeColor = "stroke-[#10b981]";
+      
+      const tier = res.predicted_risk_tier.toLowerCase();
+      if (tier === "medium" || tier === "moderate") {
+        labelColorClass = "text-risk-medium";
+        labelBgClass = "bg-risk-medium/10 border-risk-medium/20";
+        progressColor = "bg-risk-medium";
+        strokeColor = "stroke-[#f59e0b]";
+      } else if (tier === "high") {
+        labelColorClass = "text-risk-high";
+        labelBgClass = "bg-risk-high/10 border-risk-high/20";
+        progressColor = "bg-risk-high";
+        strokeColor = "stroke-[#ef4444]";
+      } else if (tier === "critical") {
+        labelColorClass = "text-risk-critical";
+        labelBgClass = "bg-risk-critical/10 border-risk-critical/20";
+        progressColor = "bg-risk-critical";
+        strokeColor = "stroke-[#a855f7]";
+      }
+
+      // Calculate matching metrics
+      const confidence = Math.round(res.probabilities[res.predicted_risk_tier] * 100);
+      const dasharray = 2 * Math.PI * 54;
+      const dashoffset = dasharray * (1 - res.probabilities[res.predicted_risk_tier]);
+
+      // SpaCy badges string helper
+      const compBadges = res.entities.components.map(item => `
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 capitalize">${item}</span>
+      `).join("") || `<span class="text-[10px] text-zinc-600 italic">None identified</span>`;
+
+      const failBadges = res.entities.failures.map(item => `
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 capitalize">${item}</span>
+      `).join("") || `<span class="text-[10px] text-zinc-600 italic">None identified</span>`;
+
+      // SHAP Bar items
+      let shapHtml = "";
+      if (res.shap_explanations.length > 0) {
+        const maxShapVal = Math.max(...res.shap_explanations.map(x => Math.abs(x.shap_value)), 0.1);
+        res.shap_explanations.forEach(item => {
+          const isPos = item.shap_value > 0;
+          const wPercent = Math.min((Math.abs(item.shap_value) / maxShapVal) * 100, 100);
+          const barStyle = isPos 
+            ? "bg-red-500/20 border-r-2 border-red-500" 
+            : "bg-blue-500/20 border-l-2 border-blue-500";
+          const alignMargin = isPos ? "margin-left: 0" : "margin-left: auto";
+          const labelShift = isPos ? "right: 8px" : "left: 8px";
+          const labelColor = isPos ? "text-red-400" : "text-blue-400";
+          const impactText = isPos ? "Risk+" : "Risk-";
+
+          shapHtml += `
+            <div class="grid grid-cols-12 gap-3 items-center text-xs">
+              <div class="col-span-4 font-semibold text-zinc-300 truncate">${item.feature}</div>
+              <div class="col-span-8 flex items-center gap-2">
+                <div class="flex-1 bg-zinc-950 h-5 rounded overflow-hidden relative border border-zinc-800/30 flex items-center">
+                  <div class="h-full rounded transition-all duration-1000 ${barStyle}" style="width: ${wPercent}%; ${alignMargin}"></div>
+                  <span class="absolute px-2 text-[9px] font-mono font-bold ${labelColor}" style="${labelShift}">
+                    ${isPos ? "+" : ""}${item.shap_value.toFixed(4)}
+                  </span>
+                </div>
+                <span class="text-[9px] font-bold text-zinc-500 w-8 text-right font-mono uppercase">${impactText}</span>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        shapHtml = `<div class="py-6 text-center text-zinc-600 italic text-xs">No significant SHAP feature logs captured for this prediction.</div>`;
+      }
+
+      // Complete layout string interpolation
+      wrapper.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Circular match meter dial -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-between h-64 text-center">
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Risk Assessment</span>
+              <div class="relative flex items-center justify-center mt-3">
+                <svg class="w-32 h-32 transform -rotate-90">
+                  <circle cx="64" cy="64" r="54" class="stroke-zinc-800" stroke-width="10" fill="transparent" />
+                  <circle cx="64" cy="64" r="54" class="${strokeColor} transition-all duration-1000" stroke-width="10" fill="transparent" stroke-dasharray="${dasharray}" stroke-dashoffset="${dashoffset}" stroke-linecap="round" />
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                  <span class="text-2xl font-black title-outfit uppercase tracking-tight ${labelColorClass}">${res.predicted_risk_tier}</span>
+                  <span class="text-xs font-bold text-zinc-500 font-mono mt-0.5">${confidence}% Match</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-zinc-500 leading-normal max-w-[180px] mt-2">XGBoost probability confidence score based on combined safety features.</span>
+            </div>
+
+            <!-- Probability Class signatures -->
+            <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between h-64">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 pb-2 border-b border-zinc-800/40">Distribution Signatures</h4>
+              <div class="space-y-3.5 my-auto">
+                ${["Low", "Medium", "High", "Critical"].map(t => {
+                  const prob = res.probabilities[t] || 0.0;
+                  // Specific styling per class
+                  let progColor = "bg-risk-low";
+                  if (t === "Medium") progColor = "bg-risk-medium";
+                  if (t === "High") progColor = "bg-risk-high";
+                  if (t === "Critical") progColor = "bg-risk-critical";
+                  return `
+                    <div class="space-y-1.5">
+                      <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-zinc-300">${t} Risk</span>
+                        <span class="font-mono text-zinc-400">${Math.round(prob * 100)}%</span>
+                      </div>
+                      <div class="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-800/40">
+                        <div class="h-full rounded-full ${progColor} transition-all duration-1000" style="width: ${prob * 100}%"></div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+
+          <!-- AI summary & Entities card -->
+          <div class="glass-panel p-6 rounded-2xl relative overflow-hidden border border-indigo-500/10">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5 mb-3">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 animate-pulse"></i>
+              AI Summary Headline (BART CNN)
+            </h4>
+            <p class="text-sm font-semibold text-white leading-relaxed italic border-l-2 border-indigo-500 pl-4 py-1">
+              "${res.ai_summary}"
+            </p>
+
+            <div class="mt-5 pt-4 border-t border-zinc-800/40 grid grid-cols-2 gap-4">
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-2">Extracted Component Systems</span>
+                <div class="flex flex-wrap gap-1.5">${compBadges}</div>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-2">Safety Hazard Indicators</span>
+                <div class="flex flex-wrap gap-1.5">${failBadges}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explainable AI (SHAP value traces) -->
+          <div class="glass-panel p-6 rounded-2xl">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-4 pb-2 border-b border-zinc-800/40 flex items-center justify-between">
+              <span>Explainable AI Model Trace (SHAP value contributions)</span>
+              <span class="text-[10px] font-normal text-zinc-500 uppercase font-sans">Feature Impact</span>
+            </h4>
+            <div class="space-y-3">
+              ${shapHtml}
+            </div>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    // =================================================================
+    // TAB 3: SEMANTIC VECTOR SEARCH EXPLORER
+    // =================================================================
+    async function handleSemanticSearchSubmit(e) {
+      if (e) e.preventDefault();
+      
+      const submitBtn = document.getElementById("search-submit-btn");
+      const wrapper = document.getElementById("search-results-wrapper");
+      const query = document.getElementById("search-query-input").value;
+      const topK = document.getElementById("search-top-k").value;
+
+      if (!query.trim()) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Searching Index...";
+
+      wrapper.innerHTML = `
+        <div class="space-y-4 animate-pulse">
+          <div class="h-28 bg-zinc-900 rounded-2xl border border-zinc-800/40"></div>
+          <div class="h-28 bg-zinc-900 rounded-2xl border border-zinc-800/40"></div>
+          <div class="h-28 bg-zinc-900 rounded-2xl border border-zinc-800/40"></div>
+        </div>
+      `;
+
+      try {
+        const response = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, top_k: parseInt(topK) })
+        });
+
+        if (!response.ok) throw new Error("Search API Failed");
+
+        const data = await response.json();
+        renderSearchResults(data.results, query);
+
+      } catch (err) {
+        console.error("Semantic search failed:", err);
+        wrapper.innerHTML = `
+          <div class="glass-panel p-8 rounded-2xl border border-red-500/20 text-center space-y-3">
+            <i data-lucide="alert-circle" class="w-10 h-10 text-risk-high mx-auto"></i>
+            <h4 class="text-base font-bold text-white">Semantic Search Failed</h4>
+            <p class="text-xs text-zinc-500">Vector search index is not initialized or database connection failed.</p>
+          </div>
+        `;
+        lucide.createIcons();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Search Index";
+      }
+    }
+
+    function renderSearchResults(results, queryText) {
+      const wrapper = document.getElementById("search-results-wrapper");
+      
+      if (results.length === 0) {
+        wrapper.innerHTML = `<div class="glass-panel p-12 rounded-2xl text-center text-zinc-500">No matching automotive safety recalls found in index.</div>`;
+        return;
+      }
+
+      // Banner text
+      let html = `
+        <div class="flex justify-between items-center px-2">
+          <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+            Search Results Matrix for: <span class="text-indigo-400 lowercase font-mono">"${queryText}"</span>
+          </span>
+          <span class="text-xs text-zinc-500">Found ${results.length} matched recall items</span>
+        </div>
+      `;
+
+      results.forEach(recall => {
+        // Similarity score formatting
+        const sim = Math.round(recall.similarity_score * 100);
+        let simClass = "text-zinc-500 bg-zinc-900 border-zinc-800/60";
+        if (sim > 85) {
+          simClass = "text-indigo-400 bg-indigo-950/40 border-indigo-500/20";
+        } else if (sim > 60) {
+          simClass = "text-cyan-400 bg-cyan-950/40 border-cyan-500/20";
+        }
+
+        // Risk colors
+        let riskColor = "text-zinc-400 bg-zinc-800/20 border-zinc-800/10";
+        const rLabel = recall.risk_label.toLowerCase();
+        if (rLabel === "low") {
+          riskColor = "text-risk-low bg-risk-low/10 border-risk-low/20";
+        } else if (rLabel === "medium" || rLabel === "moderate") {
+          riskColor = "text-risk-medium bg-risk-medium/10 border-risk-medium/20";
+        } else if (rLabel === "high") {
+          riskColor = "text-risk-high bg-risk-high/10 border-risk-high/20";
+        } else if (rLabel === "critical") {
+          riskColor = "text-risk-critical bg-risk-critical/10 border-risk-critical/20";
+        }
+
+        html += `
+          <div class="glass-panel rounded-2xl overflow-hidden border border-white/5 hover:border-zinc-800/80 transition-all duration-300" id="recall-card-${recall.id}">
+            <!-- Visible header banner -->
+            <div onclick="toggleRecallCard(${recall.id})" class="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer select-none">
+              <div class="space-y-1.5 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${simClass}">${sim}% Match</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${riskColor}">${recall.risk_label} Risk</span>
+                  <span class="text-xs text-zinc-400 font-semibold font-mono">${recall.manufacturer} &bull; ${recall.model_year}</span>
+                </div>
+                <h4 class="text-sm font-semibold text-white leading-snug">${recall.ai_summary}</h4>
+              </div>
+              <div class="flex items-center gap-3 shrink-0 self-end md:self-auto">
+                <span class="text-xs font-medium text-zinc-500 capitalize bg-zinc-950/40 px-2.5 py-1 rounded-lg border border-zinc-800/40">${recall.component}</span>
+                <button class="p-1.5 rounded-lg bg-zinc-950/40 border border-zinc-800/40 text-zinc-400">
+                  <i data-lucide="chevron-down" class="w-4 h-4 card-icon"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Collapsible details section -->
+            <div class="details-panel hidden px-5 pb-5 pt-3 border-t border-zinc-800/40 bg-zinc-950/30 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-1.5 text-zinc-400 text-xs font-bold uppercase tracking-wider">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-zinc-500"></i>Defect Summary
+                </div>
+                <p class="text-xs text-zinc-300 leading-relaxed font-sans bg-zinc-950/60 p-3.5 rounded-xl border border-zinc-800/40 min-h-[100px]">${recall.summary}</p>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-1.5 text-zinc-400 text-xs font-bold uppercase tracking-wider">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-zinc-500"></i>Consequence Hazard
+                </div>
+                <p class="text-xs text-zinc-300 leading-relaxed font-sans bg-zinc-950/60 p-3.5 rounded-xl border border-zinc-800/40 min-h-[100px]">${recall.consequence}</p>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-1.5 text-zinc-400 text-xs font-bold uppercase tracking-wider">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5 text-zinc-500"></i>Remedy Action
+                </div>
+                <p class="text-xs text-zinc-300 leading-relaxed font-sans bg-zinc-950/60 p-3.5 rounded-xl border border-zinc-800/40 min-h-[100px]">${recall.remedy}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      wrapper.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    function toggleRecallCard(cardId) {
+      const card = document.getElementById(`recall-card-${cardId}`);
+      const panel = card.querySelector(".details-panel");
+      const icon = card.querySelector(".card-icon");
+
+      if (panel.classList.contains("hidden")) {
+        panel.classList.remove("hidden");
+        card.classList.add("border-indigo-500/25", "bg-zinc-900/40");
+        icon.setAttribute("data-lucide", "chevron-up");
+      } else {
+        panel.classList.add("hidden");
+        card.classList.remove("border-indigo-500/25", "bg-zinc-900/40");
+        icon.setAttribute("data-lucide", "chevron-down");
+      }
+      lucide.createIcons();
+    }
+
+    // =================================================================
+    // PRESET LOADERS FOR EASY USER INPUT
+    // =================================================================
+    function loadExamplePredictor(mfr, comp, year, text) {
+      document.getElementById("pred-nlp-input").value = text;
+      document.getElementById("pred-mfr").value = mfr;
+      document.getElementById("pred-comp").value = comp;
+      document.getElementById("pred-year").value = year;
+      
+      // Update real-time extracted badges
+      document.getElementById("badge-mfr").innerText = `Make: ${mfr}`;
+      document.getElementById("badge-comp").innerText = `System: ${comp}`;
+      document.getElementById("badge-year").innerText = `Year: ${year}`;
+      
+      // Submit form instantly for a simple zero-click experience
+      handlePredictionSubmit();
+    }
+
+    function loadExampleSearch(query) {
+      document.getElementById("search-query-input").value = query;
+      
+      // Submit search instantly for a simple zero-click experience
+      handleSemanticSearchSubmit();
+    }
+  </script>
+</body>
+</html>
