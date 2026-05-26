@@ -47,13 +47,6 @@ app.include_router(predict.router)
 app.include_router(manufacturers.router)
 app.include_router(search.router)
 
-# Mount Static Files to serve the Single Page Application on "/"
-static_dir = Path(__file__).resolve().parent / "static"
-if static_dir.exists():
-    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
-    logger.info(f"Static web client successfully mounted from {static_dir}")
-else:
-    logger.warning(f"Static directory not found at {static_dir}. Static web client is disabled.")
 
 @app.on_event("startup")
 def startup_event():
@@ -142,6 +135,14 @@ def read_health():
             "vector_search_loaded": semantic_engine.embeddings is not None
         }
     }
+
+# Mount Static Files to serve the Single Page Application on "/" at the end to prevent routing intercept bugs
+static_dir = Path(__file__).resolve().parent / "static"
+if static_dir.exists():
+    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+    logger.info(f"Static web client successfully mounted from {static_dir}")
+else:
+    logger.warning(f"Static directory not found at {static_dir}. Static web client is disabled.")
 
 if __name__ == "__main__":
     import uvicorn

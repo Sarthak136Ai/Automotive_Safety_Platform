@@ -1,6 +1,8 @@
 import os
 import logging
 import pandas as pd
+from pathlib import Path
+import shutil
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -12,6 +14,23 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL", 
     "sqlite:///./autosentinel.db"
 )
+
+# Serverless optimization: Copy SQLite database to /tmp on Vercel to bypass read-only filesystem limits
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+    project_root = Path(__file__).resolve().parent.parent.parent.parent
+    src_db = project_root / "autosentinel.db"
+    dest_db = Path("/tmp/autosentinel.db")
+    try:
+        if src_db.exists():
+            if not dest_db.exists():
+                logger.info(f"Serverless environment detected. Copying database {src_db} to {dest_db}...")
+                shutil.copy2(src_db, dest_db)
+            DATABASE_URL = "sqlite:////tmp/autosentinel.db"
+        else:
+            logger.warning("Source SQLite database file not found for serverless replication.")
+    except Exception as e:
+        logger.error(f"Failed to replicate SQLite database to /tmp: {e}")
+
 
 # Connect arguments needed only for SQLite
 connect_args = {}
